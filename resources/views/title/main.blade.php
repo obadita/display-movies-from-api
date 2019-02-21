@@ -4,9 +4,4 @@
     @include('title.header')
     @include('title.rating')
     @include('title.footer')
-    
-
-        
-
-    
 @endsection

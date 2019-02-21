@@ -19,7 +19,7 @@ class ImageLocator
     {
         $images = $title->getCardImages();
         $trys = 3;
-        while($trys-- >0){
+        while($trys-- > 0){
             for ($i=0; $i < count($images); $i++) {
                 if(false !== $image = file_get_contents($images[$i]['url'])) {
                     Storage::disk('card_images')->put($title->getId(), $image);
@@ -32,7 +32,8 @@ class ImageLocator
             }
             sleep(1); 
         }
-        throw new NoImageAvailableException();
+
+        throw new NoImageAvailableException;
     }
     public function getMimeType(Title $title)
     {

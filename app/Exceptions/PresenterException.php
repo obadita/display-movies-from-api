@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Exceptions;
 /**
  * inspired by laracast training on presenters
@@ -6,5 +7,7 @@ namespace App\Exceptions;
  */
 class PresenterException extends \Exception
 {
-
+    public function render() {
+        abort(500);
+    }
 }

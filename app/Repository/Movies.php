@@ -9,14 +9,9 @@ use App\Entities\Title;
 use App\Exceptions\InvalidDataFormat;
 use App\Exceptions\InvalidTitleException;
 
-/**
- * Movies repository
- **/
 class Movies
 {
-    /**
-    *   $client Client
-    */
+
     private $client;
     const URL = 'https://mgtechtest.blob.core.windows.net/files/showcase.json';
     const EXPIRE = 10*60;
@@ -27,44 +22,42 @@ class Movies
     {
         $this->client = new Client(['base_uri' =>'']);
     }
-    /**
-     * @return Title[]
-     */
+
     public function getAll()
     {
         $movies = Cache::get(static::ALL_MOVIES_CACHE_KEY);
+        if (!empty($movies)) {
+            return collect($movies)->map(function($title) {
+                if (is_array($title)) {
+                    return new Title($title);
+                }
+                throw new InvalidDataFormat();
+            });
+        }
+
         try {
-            if (empty($movies)) {
-                $results = $this->client->get(static::URL)->getBody()->getContents();
-                $stringData = Encoding::fixUTF8($results);
-                $movies = json_decode($stringData, true);
-                Log::info('movies requested');
-                Cache::put(static::ALL_MOVIES_CACHE_KEY, $movies, static::EXPIRE);
-            }
+            $results = $this->client->get(static::URL)->getBody()->getContents();
+            $stringData = Encoding::fixUTF8($results);
+            $movies = json_decode($stringData, true);
+            Log::info('movies requested');
+            Cache::put(static::ALL_MOVIES_CACHE_KEY, $movies, static::EXPIRE);
         }catch (\Exception $ex) {
             Log::info($ex->getMessage());
             return collect([]);
         }
-        return collect($movies)->map(function($title) {
-            if (is_array($title)) {
-                return new Title($title);
-            }
-            throw new InvalidDataFormat();
-        });
     }
     
     public function getForPage(int $page)
     {
         $currentPage = $page > $this->countPages() ? 1 : $page;
-        return $this->getAll()
-            ->slice(($currentPage - 1) * static::ITEMS_PER_PAGE)->values()
-            ->take(static::ITEMS_PER_PAGE);
+            return $this->getAll()
+                ->slice(($currentPage - 1) * static::ITEMS_PER_PAGE)->values()
+                ->take(static::ITEMS_PER_PAGE);
     }
 
     public function countPages()
     {
         return ceil($this->getAll()->count() / static::ITEMS_PER_PAGE);
-            
     }
 
     public function findById($id)

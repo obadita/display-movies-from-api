@@ -21,13 +21,8 @@ class TitlePresenter extends Presenter {
     }
     public function cast()
     {
-        // dd($this->entity->getCast());
         return collect($this->entity->getCast())
-        ->pluck('name')
-        ->implode(', ');
+            ->pluck('name')
+            ->implode(', ');
     }
-
-    
-    
-
 }

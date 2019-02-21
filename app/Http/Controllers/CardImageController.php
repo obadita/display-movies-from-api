@@ -19,7 +19,7 @@ class CardImageController extends Controller
 
         } catch (NoImageAvailableException $e) {
             if (false === $imageContent = file_get_contents('./images/default.jpg')) {
-                return response()->make([],500);
+                abort(500);
             }
             $mimeType = "image/jpg";
 

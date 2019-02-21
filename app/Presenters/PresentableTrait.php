@@ -1,5 +1,6 @@
 <?php 
 namespace App\Presenters;
+
 use App\Exceptions\PresenterException;
 /**
  * inspired by laracast training on presenters
