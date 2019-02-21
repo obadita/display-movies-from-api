@@ -11,6 +11,16 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
+Route::get('/{page?}', [
+    'as' =>'movies', 
+    'uses' => 'MovieController@index'
+]);
+Route::get('/title/{id}', [
+    'as' =>'title', 
+    'uses' => 'TitleController@index'
+]);
+Route::get('/image/{imageId}', [
+    'as' =>'title', 
+    'uses' => 'CardImageController@index'
+]);
