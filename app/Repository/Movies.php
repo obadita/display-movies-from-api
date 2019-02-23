@@ -26,25 +26,24 @@ class Movies
     public function getAll()
     {
         $movies = Cache::get(static::ALL_MOVIES_CACHE_KEY);
-        if (!empty($movies)) {
-            return collect($movies)->map(function($title) {
-                if (is_array($title)) {
-                    return new Title($title);
-                }
-                throw new InvalidDataFormat();
-            });
-        }
-
         try {
-            $results = $this->client->get(static::URL)->getBody()->getContents();
-            $stringData = Encoding::fixUTF8($results);
-            $movies = json_decode($stringData, true);
-            Log::info('movies requested');
-            Cache::put(static::ALL_MOVIES_CACHE_KEY, $movies, static::EXPIRE);
+            if (empty($movies)) {
+                $results = $this->client->get(static::URL)->getBody()->getContents();
+                $stringData = Encoding::fixUTF8($results);
+                $movies = json_decode($stringData, true);
+                Log::info('movies requested');
+                Cache::put(static::ALL_MOVIES_CACHE_KEY, $movies, static::EXPIRE);
+            }
         }catch (\Exception $ex) {
             Log::info($ex->getMessage());
             return collect([]);
         }
+        return collect($movies)->map(function($title) {
+            if (is_array($title)) {
+                return new Title($title);
+            }
+            throw new InvalidDataFormat();
+        });
     }
     
     public function getForPage(int $page)
@@ -78,4 +77,6 @@ class Movies
         }
         return $title;
     }
+
+    
 }
